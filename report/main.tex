@@ -1,0 +1,104 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{CJK}
+\usepackage{amsmath,epsfig,algorithm,algorithmic}
+\setlength\parindent{0pt} % Removes all indentation from paragraphs - comment this line for an assignment with lots of text
+
+\begin{document}
+
+\begin{CJK*}{UTF8}{kai}
+
+\title{
+\huge Assignment 1 \\ % The assignment title
+}
+\author{Luo Zhiyi (0130339024)}
+\date{Spring 2014}
+\maketitle
+
+%符号说明：
+%
+%对于单个神经元来说，有：
+%$ a_{j}^{(k)} = f((\sum_{i=1}^{N_{k-1}}(u_{ji}^{(k)})+v_{ji}^{k}a_i^{(k-1)}+b_j^{(k)}))$
+%
+%
+%现考虑神经元
+%%{\setlength\arraycolsep{2pt}
+%%\begin{eqnarray}
+%
+%%\begin{equation}\label{(1-1)}
+%%\begin{split}
+%%%$
+%%\frac{\partial{z_j^{(l+1)}}}{\partial{z_i^{(l)}}} & =
+%%\frac{\partial{(\sum_{m=1}^{N^(l)}u_{jm}^{(l+1)}(a_{m}^{(l)})^2+v_{jm}^{(l+1)}a_m^{(l)}+b_j^{(l+1)})}}
+%%{\partial{z_i^{(l)}}}\\
+%%& = 2a_i^{(l)}u_{ji}^{(l+1)}\frac{\partial{a_i^{(l)}}}{\partial{z_i^{(l)}}}+
+%%v_{ji}^{(l+1)}\frac{\partial{a_i^{(l)}}}{\partial{z_i^{(l)}}}\\
+%%& = (2u_{ji}^{(l+1)}a_i^{(l)}+v_{ji}^{(l+1)})\frac{\partial{a_i^{(l)}}}{\partial{z_i^{(l)}}}
+%%%$
+%%\end{split}
+%%\end{equation}
+%
+%用向量形式表示得到：
+%
+%\begin{equation}\label{(1-2)}
+%\frac{\partial{\mathbf{z}^{(l+1)}}}{\partial{\mathbf{z}^{(l)}}}=
+%2\mathbf{u}^{(l+1)}\mathbf{a}^{(l)}+\mathbf{v}^{(l+1)}\mathbf{F}^{(l)}(\mathbf{z}^{(l)})
+%\end{equation}
+%其中，
+%
+%\begin{equation}\label{(1-3)}
+%\begin{split}
+%      \mathbf{F}^{(l)} & =  \mathbf{diag}({f^{'}(z_{i}^{(l)})}), \quad i=1,2,...,N_l\\
+%      \mathbf{G}^{(l)} & =  \mathbf{diag}(z_i^{(l)}f^{'}(z_i^{(l)})), \quad i=1,2,...,N_l
+%\end{split}
+%\end{equation}
+%
+%sigmoid函数的导数为 $f^{'}(z)=f(z)(1-f(z))$
+%
+%\begin{equation}\label{(1-4)}
+%\frac{\partial{\mathbf{J}}}{\partial{\mathbf{z}^{(l)}}}=
+%(\frac{\partial{\mathbf{z}^{(l+1)}}}{\partial{\mathbf{z}^{(l)}}})^{T}
+%\frac{\partial{\mathbf{J}}}{\partial{\mathbf{z^{(l+1)}}}}
+%\end{equation}
+%
+%设$\delta^{(l)}=\frac{\partial{\mathbf{J}}}{\partial{\mathbf{z}^{(l)}}}$，则有
+%\begin{equation}\label{(1-5)}
+%\delta^{(l+1)} = \delta^{(l)}(\frac{\partial{\mathbf{z}^{(l+1)}}}{\partial{\mathbf{z}^{(l)}}})^{T}
+%\end{equation}
+%对于在线学习(on-line learning)，对于第$m$个样本，进行一次参数更新。这里我们将$J(U,V,b)$简写为$J$。因为神经网络共有$M$层，所以先要求出$\delta^{(M)}$, 对于输出层$M$ 层的第i个单元的cost function 有：$J_i = (y_i-a_i^{(M)})^2$, 则
+%
+%\begin{equation}
+%\begin{split}
+%    \delta_i^{(M)} = -2(y_i - a_i^{(M)})f^{(M)}(z_i^{(M)})
+%\end{split}
+%\end{equation}
+%
+%\begin{equation}
+%\begin{split}
+%    \mathbf{\delta}_i^{(M)} = -2\mathbf{F}^{(M)}(\mathbf{z}^{(M)})(\mathbf{y} - \mathbf{a}^{(M)})
+%\end{split}
+%\end{equation}
+%
+%每来一个样本都对参数$\mathbf{u}$,$\mathbf{v}$,$\mathbf{b}$进行更新。
+%
+%\begin{equation}
+%\begin{split}
+%\mathbf{U}^{(l)} &:= \mathbf{U^{(l)}} - 2\alpha \delta^{(l+1)}(a^{(l)})^{T}\mathbf{diag}(a_i^{(l)}) \\
+%\mathbf{V}^{(l)} &:= \mathbf{V^{(l)}} - \delta^{(l)} (a^{(l)})^{T}
+%\end{split}
+%\end{equation}
+%
+%$\alpha$ 为learning rate
+%批处理学习(batch learning)
+%
+%\begin{equation}
+%\theta = ln(\frac{u}{1-u})
+%\end{equation}
+\end{CJK*}
+
+\input{introduction}
+\input{mlqp}
+\input{experiment}
+\input{conclusion}
+
+\end{document}
+

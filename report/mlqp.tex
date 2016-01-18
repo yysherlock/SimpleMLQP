@@ -1,0 +1,153 @@
+\section{Multi-layer Quadratic Perceptron}
+\subsection{MLQPs Formulation}
+In this report, I use $u_{i,j}^{(l)}$ and $v_{i,j}^{(l)}$ to denote
+the weights connecting the $i$th unit in the layer $l$ to the $j$th unit in the layer $l+1$, $b_{i}^{(l)}$ is the basis of the $i$th unit in the layer $l$. $N^{(l)}$ is the number of units in $l$th layer ($1<=l<=M$), and f(.) is the sigmoid activate function:$f(z)= \frac{1}{1+e^{-z}}$ and $f^{'}(z) = f(z)(1-f(z))$.
+
+In fact, our MLQPs is an example of \textbf{feedforward} neural network. I'll introduce the notations and formulations in MLQPs through feedforward calculation. Figure 2 describes a brief structure of the implemented MLQPs. For the feedforward process, the computation that the MLQPs represents is given by:
+\begin{equation}\label{unit}
+\begin{split}
+z_{j}^{(l)} &= \sum_{i=1}^{N^{(l-1)}}(u_{ji}^{(l)})(a_i^{(l-1)})^2+v_{ji}^{l}a_i^{(l-1)}+b_j^{(l)}
+\\
+a_{j}^{(l)} &= f(z_{j}^{(l)})
+\end{split}
+\end{equation}
+
+\subsection{Cost Function}
+Suppose we have a given training set, say {$(\mathbf{x}^{(1)},y^{(1)}),(\mathbf{x}^{(2)},y{(2)}),...,(\mathbf{x}^{(m)},y{(m)})$}.
+In detail, the $\mathbf{x}^{(i)}$ denotes the $i$th example's feature vector, contains the x-coordinate and y-coordinate information.
+Since the two-spiral classification is a binary classification problem, it implies that the data follows Bernoulli distribution, so I use the following function form to be the cost function for a single example$(\mathbf{x}^{(i)},y^{(i)})$:
+\begin{equation}
+J(U,V,b;\mathbf{x}^{(i)},y^{(i)}) = -(y^{(i)}log(h_\theta(\mathbf{x}^{(i)}))
++ (1-y^{(i)})log(1-h_\theta(\mathbf{x}^{(i)}))
+\end{equation}
+where the $h_\theta(\mathbf{x}^{(i)})$ denotes the MLQPs' output for example $(\mathbf{x}^{(i)},y^{(i)})$. In binary classification problem, a simple interpretation of  $h_\theta(\mathbf{x}^{(i)})$ is the probability of $y^{(i)}$ equals to 1, given the parameter $\theta$ and data $\mathbf{x}^{(i)}$. I also add the regularization term to avoid over-fitting problem. I set the weight decay parameter $\lambda$ to be 0.0001 by experience. Given a training set of $m$ examples, I then define the overall cost function to be
+
+\begin{equation}
+J(U,V,b) = [-\frac{1}{m}\sum_{i=1}^{m}{J(U,V,b)}] + \frac{\lambda}{2}\parallel{U}\parallel_{2}^{2} +\frac{\lambda}{2}\parallel{V}\parallel_{2}^{2}
+\end{equation}
+Our goal is to minimize the $J(U,V,b)$ as a function of $U$, $V$ and $b$. To train the MLQPs model, I will initialize each parameter to a small random value close to zero, and then apply an optimization algorithm such as batch gradient descent and online gradient descent.
+
+\subsection{Back-propagation algorithm}
+We will now describe the back propagation algorithm, which gives an efficient way to compute the partial derivatives when updating the model parameters.
+
+Intuitively, we have the following formulation of the partial derivatives calculation:
+
+\begin{equation}
+\begin{split}
+\frac{\partial{J}}{\partial{U}} &= \frac{\partial{J}}{\partial{z^{(l+1)}}}
+\frac{\partial{z^{(l+1)}}}{\partial{z^{(l)}}}\frac{\partial{z^{(l)}}}{\partial{U}}
+\\
+\frac{\partial{J}}{\partial{V}} &= \frac{\partial{J}}{\partial{z^{(l+1)}}}
+\frac{\partial{z^{(l+1)}}}{\partial{z^{(l)}}}\frac{\partial{z^{(l)}}}{\partial{V}}
+\\
+\frac{\partial{J}}{\partial{b}} &= \frac{\partial{J}}{\partial{z^{(l+1)}}}
+\frac{\partial{z^{(l+1)}}}{\partial{z^{(l)}}}\frac{\partial{z^{(l)}}}{\partial{b}}
+\end{split}
+\end{equation}
+
+More formally, we do the following derivation for each unit(Here we only consider the parameter $U$, $V$ and $b$ are similar):
+
+\begin{equation}
+\frac{\partial{J}}{\partial{u_{ij}^{(l)}}}=
+\frac{\partial{J}}{\partial{z_j^{(l+1)}}}
+\frac{\partial{z_j^{(l+1)}}}{\partial{u_{ij}^{(l)}}}
+\end{equation}
+
+\begin{equation}
+\frac{\partial{J}}{\partial{z_j^{(l)}}}=
+\frac{\partial{J}}{\partial{z_i^{(l+1)}}}
+\frac{\partial{z_i^{(l+1)}}}{\partial{a_j^{(l)}}}
+\frac{\partial{a_j^{(l)}}}{\partial{z_j^{(l)}}}
+\end{equation}
+We can obtain the following formulation through \label{unit}:
+\begin{equation}
+\frac{\partial{z_i^{(l+1)}}}{\partial{a_j^{(l)}}}=
+2u_{ji^{(l)}}a_j^{(l)}+v_{ji}^{(l)} + v_{ji}^{(l)}a_j^{(l)}
+\end{equation}
+
+\begin{equation}
+\frac{\partial{a_j^{(i)}}}{\partial{z_j^{(l)}}}=
+f(z_j^{(l)})(1-f(z_j^{(l)}))
+\end{equation}
+Let us use $\delta_j^{(l)}$ short for $\frac{\partial{J}}{\partial{z_j^{(l)}}}$.
+Then, we will get:
+
+\begin{equation}
+\delta_j^{(l)} = \delta_i^{(l+1)}
+(2u_{ji^{(l)}}a_j^{(l)}+v_{ji}^{(l)} + v_{ji}^{(l)}a_j^{(l)})
+f(z_j^{(l)})(1-f(z_j^{(l)}))
+\end{equation}
+So,
+\begin{equation}
+\frac{\partial{J}}{\partial{u_{ij}^{(l)}}}=
+\delta_i^{(l+1)}lalalalallalalllalallalalal
+\end{equation}
+
+Now, we know how to calculate the gradient of model parameters $U$, $V$ and $b$.
+
+In detail, the derivation about partial derivatives of model parameters is given as following:
+\begin{equation}\label{(1-1)}
+\begin{split}
+%$
+\frac{\partial{z_j^{(l+1)}}}{\partial{z_i^{(l)}}} & =
+\frac{\partial{(\sum_{m=1}^{N^(l)}u_{jm}^{(l+1)}(a_{m}^{(l)})^2+v_{jm}^{(l+1)}a_m^{(l)}+b_j^{(l+1)})}}
+{\partial{z_i^{(l)}}}\\
+& = 2a_i^{(l)}u_{ji}^{(l+1)}\frac{\partial{a_i^{(l)}}}{\partial{z_i^{(l)}}}+
+v_{ji}^{(l+1)}\frac{\partial{a_i^{(l)}}}{\partial{z_i^{(l)}}}\\
+& = (2u_{ji}^{(l+1)}a_i^{(l)}+v_{ji}^{(l+1)})\frac{\partial{a_i^{(l)}}}{\partial{z_i^{(l)}}}
+%$
+\end{split}
+\end{equation}
+
+\subsubsection{Batch Learning}
+Now, let's consider to train the neural network using batch gradient descent which updates the model parameters once considered the effect of all training examples. The pseudo-code of batch learning is given in Algorithm 1.
+\begin{algorithm}
+\caption{batch learning method}
+\begin{algorithmic}
+\REPEAT
+\STATE {
+for $i$ = 1 to $m$,\{
+
+\qquad using $m$ examples each iteration
+
+\begin{displaymath}
+             \theta_j:=
+             \theta_j + \alpha\frac{\partial{J}}{\partial{\theta_j}}
+             \quad \textrm{(for every $j$)}
+\end{displaymath}
+\}
+
+}
+\UNTIL{converge}
+\end{algorithmic}
+\end{algorithm}
+
+%\end{split}
+Though batch learning algorithm is stable, it takes much calculation for parameter gradients. We will discuss another technique known as online technique shortly.
+
+\subsubsection{Online Learning}
+Batch techniques which involve in processing the entire training set in one go can be computationally costly for large data sets. If the data set is sufficiently large, it may be worthwhile to use sequential algorithms, also known as online learning algorithms.
+
+Now, let's consider to train the neural network using online gradient descent. We hope that the online algorithm will be faster than the batch algorithm in this assignment. Algorithm 2 shows the online learning method for updating gradients of model parameters.
+
+\begin{algorithm}
+\caption{online learning method}
+\begin{algorithmic}
+\REPEAT
+\STATE {
+\qquad using one example each iteration
+\begin{displaymath}
+             \theta_j:=
+             \theta_j + \alpha\frac{\partial{J}}{\partial{\theta_j}}
+             \quad \textrm{(for every $j$)}
+\end{displaymath}
+}
+\UNTIL{converge}
+\end{algorithmic}
+\end{algorithm}
+
+As we will see in the experiment section, online algorithm is much faster than the batch algorithm even on our small data set.
+
+\subsection{Advanced Optimization}
+There are other algorithms that are even more sophisticated than gradient descent. Advanced algorithms such as L-BFGS can often be much faster than gradient descent. In this assignment, I use a matlab package named \textbf{minFunc} including a well implemented L-BFGS algorithm.
+
